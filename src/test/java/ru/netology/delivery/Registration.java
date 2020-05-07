@@ -1,3 +1,5 @@
+package ru.netology.delivery;
+
 public class Registration {
     public String login;
     public String password;

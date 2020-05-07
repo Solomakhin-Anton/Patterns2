@@ -1,3 +1,5 @@
+package ru.netology.delivery;
+
 import com.codeborne.selenide.SelenideElement;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.LogDetail;
@@ -13,6 +15,7 @@ import static io.restassured.RestAssured.given;
 
 
 public class RegistrationTest {
+    UserGenerator userGenerator = new UserGenerator();
     private static RequestSpecification requestSpecification = new RequestSpecBuilder()
             .setBaseUri("http://localhost")
             .setPort(9999)
@@ -45,46 +48,46 @@ public class RegistrationTest {
         open("http://localhost:9999");
         $("[name=login]").setValue("vasya");
         $("[name=password]").setValue("password");
-        $$(".button__content").find(exactText("Продолжить")).click();
-        $(withText("Ошибка")).shouldBe(hidden);
+        $(".button__text").click();
+        $(".notification_status_error").shouldBe(hidden);
         SelenideElement response = $(".body");
     }
 
     @Test
-    void shouldSubmitBlockedUser() {
+    void shouldGetErrorMessageIfSubmitBlockedUser() {
         open("http://localhost:9999");
         $("[name=login]").setValue("name");
         $("[name=password]").setValue("anotherpassword");
-        $$(".button__content").find(exactText("Продолжить")).click();
-        $(withText("Ошибка")).shouldBe(visible);
+        $(".button__text").click();
+        $(".notification_status_error").shouldBe(visible);
         SelenideElement response = $(withText("Ошибка"));
     }
 
     @Test
-    void shouldSubmitWithIncorrectPassword() {
+    void shouldGetErrorMessageIfSubmitWithIncorrectPassword() {
         open("http://localhost:9999");
         $("[name=login]").setValue("vasya");
-        $("[name=password]").setValue("incorrectpassword");
-        $$(".button__content").find(exactText("Продолжить")).click();
-        $(withText("Неверно указан логин или пароль")).shouldBe(visible);
+        $("[name=password]").setValue(userGenerator.makePassword());
+        $(".button__text").click();
+        $(".notification_status_error").shouldBe(visible);
     }
 
     @Test
-    void shouldSubmitWithIncorrectLogin() {
+    void shouldGetErrorMessageIfSubmitWithIncorrectLogin() {
         open("http://localhost:9999");
-        $("[name=login]").setValue("logname");
+        $("[name=login]").setValue(userGenerator.makeLogin());
         $("[name=password]").setValue("password");
-        $$(".button__content").find(exactText("Продолжить")).click();
-        $(withText("Неверно указан логин или пароль")).shouldBe(visible);
+        $(".button__text").click();
+        $(".notification_status_error").shouldBe(visible);
     }
 
     @Test
-    void shouldSubmitWithIncorrectLoginAndPassword() {
+    void shouldGetErrorMessageIfSubmitWithIncorrectLoginAndPassword() {
         open("http://localhost:9999");
-        $("[name=login]").setValue("logname");
-        $("[name=password]").setValue("incorrectpassword");
-        $$(".button__content").find(exactText("Продолжить")).click();
-        $(withText("Неверно указан логин или пароль")).shouldBe(visible);
+        $("[name=login]").setValue(userGenerator.makeLogin());
+        $("[name=password]").setValue(userGenerator.makePassword());
+        $(".button__text").click();
+        $(".notification_status_error").shouldBe(visible);
     }
 
 }
