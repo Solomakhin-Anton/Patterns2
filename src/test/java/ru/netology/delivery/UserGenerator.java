@@ -24,15 +24,7 @@ public class UserGenerator {
 
         given()
                 .spec(requestSpecification)
-                .body(new Registration("vasya", "password", "active"))
-                .when()
-                .post("/api/system/users")
-                .then()
-                .statusCode(200);
-
-        given()
-                .spec(requestSpecification)
-                .body(new Registration("name", "anotherpassword", "blocked"))
+                .body(registration)
                 .when()
                 .post("/api/system/users")
                 .then()
@@ -41,8 +33,9 @@ public class UserGenerator {
 
 
     public static Registration getValidActiveUser(){
-        String login = "vasya";
-        String password = "password";
+        Faker faker = new Faker(new Locale("en"));
+        String login = faker.name().firstName();
+        String password = faker.internet().password();
         String status = "active";
         Registration registration = new Registration(login,password,status);
         makeRequest(registration);
@@ -50,8 +43,9 @@ public class UserGenerator {
     }
 
     public static Registration getValidBlockedUser(){
-        String login = "name";
-        String password = "anotherpassword";
+        Faker faker = new Faker(new Locale("en"));
+        String login = faker.name().firstName();
+        String password = faker.internet().password();
         String status = "blocked";
         Registration registration = new Registration(login,password,status);
         makeRequest(registration);
@@ -60,32 +54,32 @@ public class UserGenerator {
 
     public static Registration getUserWithIncorrectPassword(){
         Faker faker = new Faker(new Locale("en"));
-        String login = "vasya";
-        String password = faker.internet().password();
-        String status = "active";
-        Registration registration = new Registration(login,password,status);
-        makeRequest(registration);
-        return registration;
-    }
-
-    public static Registration getUserWithIncorrectLogin(){
-        Faker faker = new Faker(new Locale("en"));
         String login = faker.name().firstName();
         String password = "password";
         String status = "active";
         Registration registration = new Registration(login,password,status);
         makeRequest(registration);
-        return registration;
+        return new Registration(login, "incorrectpassword", status);
     }
 
-    public static Registration getUserWithIncorrectLoginAndPassword(){
+    public static Registration getUserWithIncorrectLogin(){
         Faker faker = new Faker(new Locale("en"));
-        String login = faker.name().firstName();
+        String login = "vasya";
         String password = faker.internet().password();
         String status = "active";
         Registration registration = new Registration(login,password,status);
         makeRequest(registration);
-        return registration;
+        return new Registration("petya", password, status);
+    }
+
+    public static Registration getUserWithIncorrectLoginAndPassword(){
+        Faker faker = new Faker(new Locale("en"));
+        String login = "vasya";
+        String password = "password";
+        String status = "active";
+        Registration registration = new Registration(login,password,status);
+        makeRequest(registration);
+        return new Registration("petya", "incorrectpassword", status);
     }
 
 }
